@@ -71,6 +71,28 @@ def leftmost_covering_set(T):
     return P
 
 def partial_labeling(T):
+    def node_processing(node,parent,(i,pos)):
+        r"""
+        Mark point along the edge (parent,node) if the string depht of parent is
+        smaller than the lenght of the tamdem repeat at the head of P(node).
+        Make it for all such squares pairs and remove them from P(node).
+        P(node)=P[i][pos:]
+        INPUTS:
+            node - a node of T
+            parent - the parent of node in T
+            (i,pos) - the pair that represent the head of the list P(node)
+        OUTPUT:
+            (i,pos) - the new head of P(node)
+        """
+        while pos<len(P[i]) and P[i][pos][1]>string_depth[parent]:
+            label=P[i][pos][1]-string_depth[parent]
+            try:
+                labeling[(parent,node)].append(label)
+            except KeyError:
+                labeling[(parent,node)]=[label]
+            pos+=1
+        return (i,pos)
+
     def treat_node(current_node,parent):
         #Call recursively on children of current_node
         if D.has_key(current_node):
@@ -86,22 +108,15 @@ def partial_labeling(T):
         else: #The node is a child
             node_list=(n-string_depth[current_node],0)
         #Make teatement on current node hear
-        (i,pos)=node_list
-        while len(P[i])>pos and P[i][pos][1]>string_depth[parent]:
-            if edge_label.has_key((parent,current_node)):
-                edge_label[(parent,current_node)].append(P[i][pos][1]-string_depth[parent])
-            else:
-                edge_label[(parent,current_node)]=[P[i][pos][1]-string_depth[parent]]
-            pos+=1
-        return (i,pos)
+        return node_processing(current_node,parent,node_list)
     
     P=leftmost_covering_set(T)
     D=T.transition_function_dictionary()
     string_depth=dict([(0,0)])
     n=len(T.word())
-    edge_label=dict()
+    labeling=dict()
     treat_node(0,None)
-    return edge_label
+    return labeling
 
 def complete_labeling(T):
     r"""
@@ -199,6 +214,7 @@ def complete_labeling(T):
                     for l in prelabeling[edge]:
                         square_start=edge_label[0]-(j-i)
                         suffix_link_walk(current_node,child,l,square_start)
+
     prelabeling=partial_labeling(T)
     labeling=dict()
     D=T.transition_function_dictionary()
@@ -221,7 +237,6 @@ def list_squares(T):
     squares=[Word('')]
     treat_node(0,(0,0))
     return squares
-
 
 #Truc à améliorer
 def longest_forward_extension(w,x,y):
