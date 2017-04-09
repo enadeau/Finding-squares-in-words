@@ -104,6 +104,35 @@ def partial_labeling(T):
     return edge_label
 
 def complete_labelling(T):
+    def count_and_skip(T,node,(i,j)):
+        r"""
+        Use count and skip trick to follow the path starting and "node" and
+        reading T.word()[i:j]. We assume that reading T.word()[i:j] is possible
+        from "node"
+
+        INPUTS:
+            T - suffix tree of a word w
+            node - explicit node of T
+            (i,j) - Indices of factor T.word()[i:j]
+        OUTPUT:
+            The node obtained by starting at "node" and following the edges
+            labelled by the letter of T.word()[i:j]. Returns "("explicit",
+            end_node) if w and at a "end_node", of "("implicit", (edge, d))" if
+            we end at d sports along an edge. If it's not possible to read the
+            factor, return None
+        """
+        if i==j: #We're done reading the factor
+            return ('explicit',node)
+        transition=T._find_transition(node,T._letters[i])
+        child=transition[1]
+        if transition[0][1]==None: #The child is a leaf
+            edge_length=len(T.word())-transition[0][0]+1
+        else:
+            edge_length=transition[0][1]-transition[0][0]+1
+        if edge_length>j-i: #The reading stop on this edge
+            return ('implicit',((node,child),j-i))
+        return count_and_skip(T,child,(i+edge_length,j))
+
     def suffix_link_walk(u,v,l,start):
         print (u,v,l,start)
         (i,j)=(D[u][v][0],D[u][v][0]+l) #suffix to read
