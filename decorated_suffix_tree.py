@@ -94,6 +94,20 @@ def partial_labeling(T):
         return (i,pos)
 
     def treat_node(current_node,parent):
+        r"""
+        Proceed to a depth first search in T, couting the string_depth of each
+        node a processing each node for marking
+
+        To initiate de depth first search call treat_node(0,None)
+
+        INPUTS:
+            current_node - A node
+            parent - Parent of current_node in T
+        OUTPUT:
+            The resultint list P(current_node) avec current_node have been
+            process by node_processing. The ouput is a pair (i,pos) such that
+            P[i][pos:] is the list of current_node
+        """
         #Call recursively on children of current_node
         if D.has_key(current_node):
             node_list=(n,0)
