@@ -103,23 +103,21 @@ def partial_labeling(T):
     treat_node(0,None)
     return edge_label
 
-def complete_labelling(T):
-    def count_and_skip(T,node,(i,j)):
+def complete_labeling(T):
+    def count_and_skip(node,(i,j)):
         r"""
         Use count and skip trick to follow the path starting and "node" and
         reading T.word()[i:j]. We assume that reading T.word()[i:j] is possible
         from "node"
 
         INPUTS:
-            T - suffix tree of a word w
             node - explicit node of T
             (i,j) - Indices of factor T.word()[i:j]
         OUTPUT:
             The node obtained by starting at "node" and following the edges
-            labelled by the letter of T.word()[i:j]. Returns "("explicit",
+            labeled by the letter of T.word()[i:j]. Returns "("explicit",
             end_node) if w and at a "end_node", of "("implicit", (edge, d))" if
-            we end at d sports along an edge. If it's not possible to read the
-            factor, return None
+            we end at d sports along an edge.
         """
         if i==j: #We're done reading the factor
             return ('explicit',node)
@@ -131,34 +129,49 @@ def complete_labelling(T):
             edge_length=transition[0][1]-transition[0][0]+1
         if edge_length>j-i: #The reading stop on this edge
             return ('implicit',((node,child),j-i))
-        return count_and_skip(T,child,(i+edge_length,j))
+        return count_and_skip(child,(i+edge_length,j))
 
     def suffix_link_walk(u,v,l,start):
-        print (u,v,l,start)
+        r"""
+        Execute a chain of suffix walk until a walk is unsuccesful or it got to
+        a point already register in QP. Register all visited point in Q
+        INPUTS:
+            (u,v) - edge on wich the point is registered
+            l - depth of the registered point on (u,v)
+            start - start of the squares registered by the label (u,v),l
+        """
+        #Mark the point in labeling
+        try:
+            labeling[(u,v)].append(l)
+        except KeyError:
+            labeling[(u,v)]=[l]
+        #Make the walk
         (i,j)=(D[u][v][0],D[u][v][0]+l) #suffix to read
         u=T.suffix_link(u)
-        v=T._find_transition(u,T.word()[i])[1]
-        while D[u][v][1]!=None and j-i>=D[u][v][1]-D[u][v][0]:
-            l_edge=(D[u][v][1]-D[u][v][0])
-            i=i+l_edge
-            u=v
-            v=T._find_transition(v,T.word()[i])[1]
-        print (u,v,l,start)
-        print (i,j)
-        transition=T.transition_function(T.word()[i:j]*T.word()[start:start+1],node=u)
-        if transition!=None:
-            v=T._find_transition(u,(T.word()[i:j]*T.word()[start:start+1])[0])[1]
-            has_transition=True
+        final_state=count_and_skip(u,(i,j))
+        successful=False
+        if final_state[0]=='explicit':
+            parent=final_state[1]
+            transition=T._find_transition(parent,T._letters[start])
+            if transition!=None:
+                child=transition[1]
+                successful=True
+                depth=1
         else:
-            has_transition=False
-        is_not_registered=((not QP.has_key((u,v))) or (QP.has_key((u,v)) and (j-i+1) not in QP[(u,v)]))
-        if has_transition and is_not_registered:
-            if Q.has_key((u,v)):
-                Q[(u,v)].append(j-i+1)
-            else:
-                Q[(u,v)]=[j-i+1]
-            if (not QP.has_key((u,v))) or (QP.has_key((u,v)) and (j-i+1) not in QP[(u,v)]):
-                suffix_link_walk(u,v,j-i+1,start+1)
+            parent=final_state[1][0][0]
+            child=final_state[1][0][1]
+            depth=final_state[1][1]
+            next_letter=T._letters[D[parent][child][0]+depth]
+            if next_letter==T._letters[start]:
+                successful=True
+                depth+=1
+        #If needed start a new walk
+        if successful:
+            try:
+                if depth not in prelabeling[(parent,child)]:
+                    suffix_link_walk(parent,child,depth,start+1)
+            except KeyError:
+                suffix_link_walk(parent,child,depth,start+1)
 
     def treat_node(current_node,(i,j)):
         if D.has_key(current_node):
@@ -166,17 +179,15 @@ def complete_labelling(T):
                 edge=(current_node,child)
                 edge_label=(D[edge[0]][edge[1]])
                 treat_node(child,(edge_label[0]-(j-i),edge_label[1]))
-                if QP.has_key((current_node,child)):
-                    for l in QP[(current_node,child)]:
+                if prelabeling.has_key((current_node,child)):
+                    for l in prelabeling[(current_node,child)]:
                         square_start=edge_label[0]-(j-i)
                         suffix_link_walk(current_node,child,l,square_start)
-    QP=partial_labeling(T)
-    Q=dict()
-    for key in QP.iterkeys():
-        Q[key]=copy(QP[key])
+    prelabeling=partial_labeling(T)
+    labeling=dict()
     D=T.transition_function_dictionary()
     treat_node(0,(0,0))
-    return Q
+    return labeling 
 
 def list_squares(T):
     def treat_node(current_node,(i,j)):
@@ -190,7 +201,7 @@ def list_squares(T):
                         square_start=edge_label[0]-(j-i)
                         squares.append(T.word()[square_start:edge_label[0]+l])
     D=T.transition_function_dictionary()
-    Q=complete_labelling(T)
+    Q=complete_labeling(T)
     squares=[Word('')]
     treat_node(0,(0,0))
     return squares
@@ -250,8 +261,10 @@ def run_test(n,print_word=False):
         L=list_squares(T)
         S2=set(L)
         if len(S2)!=len(L):
+            print "Problème de doublon avec %s" %w
             return False
         if not(S2.issubset(S1) and S1.issubset(S2)):
+            print "Problème avec %s" %w
             return False
     return True
 
