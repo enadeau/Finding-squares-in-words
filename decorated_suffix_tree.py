@@ -104,6 +104,13 @@ def partial_labeling(T):
     return edge_label
 
 def complete_labeling(T):
+    r"""
+    Returns a dictionnary of edges of T, whit markpoint for the end of each
+    square types of T.word()
+    INPUT:
+        T - Suffix tree
+    """
+
     def count_and_skip(node,(i,j)):
         r"""
         Use count and skip trick to follow the path starting and "node" and
@@ -174,13 +181,22 @@ def complete_labeling(T):
                 suffix_link_walk(parent,child,depth,start+1)
 
     def treat_node(current_node,(i,j)):
+        r"""
+        Execute a depht first search on T and start a suffix walk for labeled
+        points on each edges of T. The fonction is reccursive, call
+        treat_node(0,(0,0)) to start the search
+        INPUTS
+            current_node - The node that is to treat
+            (i,j) - Pair of index such that the path from 0 to current_node
+            reads T.word()[i:j]
+        """
         if D.has_key(current_node):
             for child in D[current_node].iterkeys():
                 edge=(current_node,child)
-                edge_label=(D[edge[0]][edge[1]])
+                edge_label=D[edge[0]][edge[1]]
                 treat_node(child,(edge_label[0]-(j-i),edge_label[1]))
                 if prelabeling.has_key((current_node,child)):
-                    for l in prelabeling[(current_node,child)]:
+                    for l in prelabeling[edge]:
                         square_start=edge_label[0]-(j-i)
                         suffix_link_walk(current_node,child,l,square_start)
     prelabeling=partial_labeling(T)
