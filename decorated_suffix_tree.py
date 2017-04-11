@@ -1,3 +1,6 @@
+from tqdm import tqdm
+#To install tqdm run sage -pip install tqdm in a terminal
+
 def LZ_decomposition(T):
     r"""Take the implicit suffix tree of a word and return the Lempel-Ziv
     decomposition of the word in the form of a list iB of index such that the
@@ -41,6 +44,7 @@ def leftmost_covering_set(T):
             k2=longest_backward_extension(w,B[i+1]-1,q-1)
             start=max(q-k2,q-k+1)
             if k1+k2>=k and k1>0 and start>=B[i]:
+                #print "Condition 1 yield (%s,%s) for block %s" %(start,2*k,i)
                 yield (start,2*k)
     
     def condition2_square_pairs(i):
@@ -56,7 +60,9 @@ def leftmost_covering_set(T):
             k1=longest_forward_extension(w,B[i],q)
             k2=longest_backward_extension(w,B[i]-1,q-1)
             start=max(B[i]-k2,B[i]-k+1)
-            if k1+k2>=k and k1>0 and start+k<=B[i+1] and k2>0:
+            #print "k=%s q=%s k1=%s k2=%s" %(k,q,k1,k2)
+            if k1+k2>=k and k1>0 and start+k<=B[i+1] and k2>0 and start<B[i]:
+                #print "Condition 2 yield (%s,%s) for block %s" %(start,2*k,i)
                 yield (start,2*k)
 
     w=T.word()
@@ -297,7 +303,7 @@ def naive_square_voc(T):
     return set(squares)
 
 def run_test(n,print_word=False):
-    for w in Words('012',n):
+    for w in tqdm(Words('012',n)):
         if print_word==True:
             print w
         S1=naive_square_voc(w)
