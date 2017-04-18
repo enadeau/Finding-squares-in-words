@@ -43,8 +43,9 @@ def leftmost_covering_set(T):
             k1=longest_forward_extension(w,B[i+1],q)
             k2=longest_backward_extension(w,B[i+1]-1,q-1)
             start=max(q-k2,q-k+1)
-            if k1+k2>=k and k1>0 and start>=B[i]:
+            if k1+k2>=k and k1>0:# and start>=B[i]:
                 #print "Condition 1 yield (%s,%s) for block %s" %(start,2*k,i)
+                #print start>=B[i]
                 yield (start,2*k)
     
     def condition2_square_pairs(i):
@@ -60,16 +61,17 @@ def leftmost_covering_set(T):
             k1=longest_forward_extension(w,B[i],q)
             k2=longest_backward_extension(w,B[i]-1,q-1)
             start=max(B[i]-k2,B[i]-k+1)
-            #print "k=%s q=%s k1=%s k2=%s" %(k,q,k1,k2)
-            if k1+k2>=k and k1>0 and start+k<=B[i+1] and k2>0 and start<B[i]:
+            #print "k=%s q=%s k1=%s k2=%s, start=%s, h1=%s" %(k,q,k1,k2,start,B[i+1])
+            if k1+k2>=k and k1>0 and start+k<=B[i+1] and k2>0:# and start<B[i]:
                 #print "Condition 2 yield (%s,%s) for block %s" %(start,2*k,i)
+                #print start<B[i]
                 yield (start,2*k)
 
     w=T.word()
     B=LZ_decomposition(T)
     P=[[] for _ in w]
     for i in range(len(B)-1):
-        squares=list(condition1_square_pairs(i))+list(condition2_square_pairs(i))
+        squares=list(condition2_square_pairs(i))+list(condition1_square_pairs(i))
         for (i,l) in squares:
             P[i].append((i,l))
     for l in P:
@@ -302,21 +304,45 @@ def naive_square_voc(T):
         squares.append(f)
     return set(squares)
 
-def run_test(n,print_word=False):
-    for w in tqdm(Words('012',n)):
-        if print_word==True:
-            print w
+def run_test(n,alphabet='01',test_for_double=False):
+    r"""
+    Compare the algorithme with a naive algorithme
+    INPUTS:
+        n - size of words to test on
+        test_for_double - If true detect a bug if the algorithm return a double
+        alphabet - the alphabet to test on
+    OUTPUT:
+        True if works for all words, False if it bugs for a word
+    """
+    for w in tqdm(Words(alphabet,n)):
         S1=naive_square_voc(w)
-        w=Word(str(w)+'$')
+        w=Word(w,alphabet+'$')*Word('$')
         T=w.suffix_tree()
         L=list_squares(T)
         S2=set(L)
-        if len(S2)!=len(L):
+        if test_for_double and len(S2)!=len(L):
             print "Problème de doublon avec %s" %w
+            print "is_sort_leftmost(%s)=%s" %(w,is_sort_leftmost(w))
             return False
         if not(S2.issubset(S1) and S1.issubset(S2)):
             print "Problème avec %s" %w
             return False
+    return True
+
+def is_sort_leftmost(w,strictly=True):
+    r"""
+    Verify if the leftmost covering set is sort according to the algorithm.
+    If strictly is true, the list must be stricly increasing in order
+    INPUTS:
+        w - A word ending with $
+    """
+    covering=leftmost_covering_set(w.suffix_tree())
+    for l in covering:
+        for i in range(len(l)-1):
+            if strictly and l[i][1]<=l[i+1][1]:
+                return False
+            elif l[i][1]<=l[i+1][1]:
+                return False
     return True
 
 def LZ_decomposition_explicit(T):
