@@ -56,7 +56,7 @@ def leftmost_covering_set(T):
             end=B[i+2]-B[i]+1
         except IndexError:
             end=B[i+1]-B[i]+1
-        for k in range(1,end):
+        for k in range(2,end):
             q=B[i]+k
             k1=longest_forward_extension(w,B[i],q)
             k2=longest_backward_extension(w,B[i]-1,q-1)
