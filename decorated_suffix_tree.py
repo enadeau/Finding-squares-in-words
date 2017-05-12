@@ -43,7 +43,7 @@ def leftmost_covering_set(T):
             k1=longest_forward_extension(w,B[i+1],q)
             k2=longest_backward_extension(w,B[i+1]-1,q-1)
             start=max(q-k2,q-k+1)
-            if k1+k2>=k and k1>0:# and start>=B[i]:
+            if k1+k2>=k and k1>0 and start>=B[i]:
                 #print "Condition 1 yield (%s,%s) for block %s" %(start,2*k,i)
                 #print start>=B[i]
                 yield (start,2*k)
@@ -56,7 +56,7 @@ def leftmost_covering_set(T):
             end=B[i+2]-B[i]+1
         except IndexError:
             end=B[i+1]-B[i]+1
-        for k in range(1,end):
+        for k in range(2,end):
             q=B[i]+k
             k1=longest_forward_extension(w,B[i],q)
             k2=longest_backward_extension(w,B[i]-1,q-1)
