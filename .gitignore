@@ -7,3 +7,5 @@
 *.log
 figure
 *.swp
+*.bib
+*.blg
