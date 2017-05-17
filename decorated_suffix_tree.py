@@ -109,10 +109,29 @@ def count_and_skip(self,node,(i,j)):
         return ('implicit',((node,child),j-i))
     return self.count_and_skip(child,(i+edge_length,j))
 
+def suffix_walk(self,(edge,l)):
+    r"""
+    INPUT:
+        edge - the edge containign the state
+        l - the string-depth of the state on edge (l>0)
+    OUTPUT:
+      Dépend de ce que je fait avec count_and_skip  
+    """
+    #If the state is implicit
+    parent=self.suffix_link(edge[0])
+    for (i,j) in self._transition_function[edge[0]]:
+        if self._transition_function[edge[0]][(i,j)]==edge[1]:
+            break
+    #(i-1,j) is the label of edge
+    i-=1
+    return self.count_and_skip(parent,(i,i+l))
+    
+
 from sage.combinat.words.suffix_trees import ImplicitSuffixTree
 ImplicitSuffixTree.LZ_decomposition = LZ_decomposition
 ImplicitSuffixTree.leftmost_covering_set = leftmost_covering_set
 ImplicitSuffixTree.count_and_skip=count_and_skip
+ImplicitSuffixTree.suffix_walk=suffix_walk
 
 #===============================================================================
 #        Fonction à ajouter Word
