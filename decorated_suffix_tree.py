@@ -85,8 +85,8 @@ def leftmost_covering_set(T):
 def count_and_skip(self,node,(i,j)):
     r"""
     Use count and skip trick to follow the path starting and "node" and
-    reading self.word()[i:j]. We assume that reading self.word()[i:j] is possible
-    from "node"
+    reading self.word()[i:j]. We assume that reading self.word()[i:j] is 
+    possible from "node"
 
     INPUTS:
         node - explicit node of T
@@ -94,7 +94,7 @@ def count_and_skip(self,node,(i,j)):
     OUTPUT:
         The node obtained by starting at "node" and following the edges
         labeled by the letter of T.word()[i:j]. Returns "("explicit",
-        end_node) if w and at a "end_node", of "("implicit", (edge, d))" if
+        end_node) if w and at a "end_node", of "("implicit", edge, d)" if
         we end at d sports along an edge.
     """
     if i==j: #We're done reading the factor
@@ -106,7 +106,7 @@ def count_and_skip(self,node,(i,j)):
     else:
         edge_length=transition[0][1]-transition[0][0]+1
     if edge_length>j-i: #The reading stop on this edge
-        return ('implicit',((node,child),j-i))
+        return ('implicit',(node,child),j-i)
     return self.count_and_skip(child,(i+edge_length,j))
 
 def suffix_walk(self,(edge,l)):
@@ -277,9 +277,9 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
                     successful=True
                     depth=1
             else:
-                parent=final_state[1][0][0]
-                child=final_state[1][0][1]
-                depth=final_state[1][1]
+                parent=final_state[1][0]
+                child=final_state[1][1]
+                depth=final_state[2]
                 next_letter=self._letters[D[parent][child][0]+depth]
                 if next_letter==self._letters[start]:
                     successful=True
