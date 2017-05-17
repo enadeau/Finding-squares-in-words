@@ -318,7 +318,14 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
         treat_node(0,(0,0))
         return labeling
         
-    def list_squares(self):
+    def square_vocabulary(self,output="pair"):
+        r"""
+        Return the list of squares in the squares vocabulary of self.word.
+        Return a list of pair in output="pair" and the explicit word if
+        output="word"
+        INPUTS:
+            output - "pair" or "word"
+        """
         def treat_node(current_node,(i,j)):
             if D.has_key(current_node):
                 for child in D[current_node].iterkeys():
@@ -328,12 +335,20 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
                     if Q.has_key((current_node,child)):
                         for l in Q[(current_node,child)]:
                             square_start=edge_label[0]-(j-i)
-                            squares.append(self.word()[square_start:edge_label[0]+l])
+                            pair=(square_start,edge_label[0]+l-square_start)
+                            squares.append(pair)
+
+        if not(output=="pair" or output=="word"):
+            raise ValueError("output should be 'pair' or 'word'; got %s" %output)
         D=self.transition_function_dictionary()
         Q=self.labeling
-        squares=[Word('')]
+        squares=[(0,0)]
         treat_node(0,(0,0))
-        return squares
+        if output=="pair":
+            return squares
+        else:
+            return [self.word()[i:i+l] for (i,l) in squares]
+
 #===============================================================================
 #        Pas encore triée
 #===============================================================================
@@ -363,7 +378,7 @@ def run_test(n,alphabet='01',test_for_double=False):
         S1=naive_square_voc(w)
         w=Word(w,alphabet+'$')*Word('$')
         T=DecoratedSuffixTree(w)
-        L=T.list_squares()
+        L=T.square_vocabulary(output="word")
         S2=set(L)
         if test_for_double and len(S2)!=len(L):
             print "Problème de doublon avec %s" %w
