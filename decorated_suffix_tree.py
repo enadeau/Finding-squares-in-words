@@ -252,7 +252,7 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
             T - Suffix tree
         """
 
-        def suffix_link_walk(u,v,l,start):
+        def walk_chain(u,v,l,start):
             r"""
             Execute a chain of suffix walk until a walk is unsuccesful or it got to
             a point already register in QP. Register all visited point in Q
@@ -267,9 +267,7 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
             except KeyError:
                 labeling[(u,v)]=[l]
             #Make the walk
-            (i,j)=(D[u][v][0],D[u][v][0]+l) #suffix to read
-            u=self.suffix_link(u)
-            final_state=self.count_and_skip(u,(i,j))
+            final_state=self.suffix_walk(((u,v),l))
             successful=False
             if final_state[0]=='explicit':
                 parent=final_state[1]
@@ -290,9 +288,9 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
             if successful:
                 try:
                     if depth not in prelabeling[(parent,child)]:
-                        suffix_link_walk(parent,child,depth,start+1)
+                        walk_chain(parent,child,depth,start+1)
                 except KeyError:
-                    suffix_link_walk(parent,child,depth,start+1)
+                    walk_chain(parent,child,depth,start+1)
 
         def treat_node(current_node,(i,j)):
             r"""
@@ -312,7 +310,7 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
                     if prelabeling.has_key((current_node,child)):
                         for l in prelabeling[edge]:
                             square_start=edge_label[0]-(j-i)
-                            suffix_link_walk(current_node,child,l,square_start)
+                            walk_chain(current_node,child,l,square_start)
 
         prelabeling=self._partial_labeling()
         labeling=dict()
