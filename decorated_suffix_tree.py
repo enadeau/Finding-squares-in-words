@@ -56,17 +56,41 @@ def LZ_decomposition(T):
 
 def leftmost_covering_set(T):
     r"""
-    Compute the leftmost covering set of squares in T.word().
+    Compute the leftmost covering set of squares pair in T.word(). Return square
+    as pair (i,l) specifying T.word()[i:i+l]
 
-    INPUTS:
-        T - Suffix tree
-    OUTPUTS:
-        Leftmost covering set of pair
+    A leftmost covering set is a set such that the leftmost occurence (j,l) of a
+    type of square in T.word() is covered by a pair (i,l) in the set for all
+    types of squares. We say that (j,l) is covered by (i,l) if (i,l), (i+1,l),
+    ..., (j,l) are all squares.
+
+    The set is return in the form of a list P such that P[i] contains all the
+    the length of square starting at i in the set. The list P[i] are sort in
+    decreasing order.
+    
+    EXAMPLES:
+
+        sage: w=Word('abaabaabbaaabaaba')
+        sage: T=w.suffix_tree()
+        sage: T.leftmost_covering_set()
+        [[6], [6], [2], [], [], [], [], [2], [], [], [6, 2], [], [], [], [], [], []]
+        sage: w=Word('abaca')
+        sage: T=w.suffix_tree()
+        sage: T.leftmost_covering_set()
+        [[], [], [], [], []]
+
+    REFERENCE:
+
+    - [1] Gusfield, D., & Stoye, J. (2004). Linear time algorithms for finding
+      and representing all the tandem repeats in a string. Journal of Computer
+      and System Sciences, 69(4), 525-546.
     """
     def condition1_square_pairs(i):
-        r"""Compute the square that has their center in the i-th block of 
+        r"""
+        Compute the square that has their center in the i-th block of 
         LZ-decomposition and that start in the i-th block and end in the
-        (i+1)-th"""
+        (i+1)-th
+        """
         for k in range(1,B[i+1]-B[i]+1):
             q=B[i+1]-k
             k1=w.longest_forward_extension(B[i+1],q)
@@ -78,9 +102,11 @@ def leftmost_covering_set(T):
                 yield (start,2*k)
     
     def condition2_square_pairs(i):
-        r"""Compute the squares that has their center in the i-th block of the
+        r"""
+        Compute the squares that has their center in the i-th block of the
         LZ-decomposition and that starts in the (i-1)-th block or before. Their
-        end is either in the i-th or the (i+1)-th block"""
+        end is either in the i-th or the (i+1)-th block
+        """
         try:
             end=B[i+2]-B[i]+1
         except IndexError:
@@ -102,7 +128,7 @@ def leftmost_covering_set(T):
     for i in range(len(B)-1):
         squares=list(condition2_square_pairs(i))+list(condition1_square_pairs(i))
         for (i,l) in squares:
-            P[i].append((i,l))
+            P[i].append(l)
     for l in P:
         l.reverse()
     return P
@@ -223,8 +249,8 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
             OUTPUT:
                 (i,pos) - the new head of P(node)
             """
-            while pos<len(P[i]) and P[i][pos][1]>string_depth[parent]:
-                label=P[i][pos][1]-string_depth[parent]
+            while pos<len(P[i]) and P[i][pos]>string_depth[parent]:
+                label=P[i][pos]-string_depth[parent]
                 try:
                     labeling[(parent,node)].append(label)
                 except KeyError:
