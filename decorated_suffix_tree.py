@@ -24,25 +24,28 @@ def LZ_decomposition(T):
         sage: T = w.suffix_tree()
         sage: T.LZ_decomposition()
         [0,1,3,4,5,7]
+        sage: w=Word('0000100101')
+        sage: T=w.suffix_tree()
+        sage: T.LZ_decomposition()
+        [0,1,4,5,9,10]
     """
     iB=[0]
     i=0
     w=T.word()
     while i<len(w):
         l=0
-        s=0
-        ((x,y),successor)=T._find_transition(s, w[i])
-        x=x-1 #Pourquoi find_transtion retourne pas la bonne étiquette?
+        ((x,y),successor)=T._find_transition(0, w[i])
+        x=x-1
         while x<i+l:
             if y==None:
                 l=len(w)-i
             else:
                 l+=y-x
-            if i+l==len(w):
+            if i+l>=len(w):
+                l=len(w)-i
                 break
-            s=successor
-            ((x,y),successor)=T._find_transition(s,w[i+l])
-            x=x-1 #même question ici
+            ((x,y),successor)=T._find_transition(successor,w[i+l])
+            x=x-1
         i+=max(1,l)
         iB.append(i)
     return iB
