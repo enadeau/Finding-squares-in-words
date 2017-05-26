@@ -9,25 +9,29 @@ def LZ_decomposition(T):
     Take the implicit suffix tree of a word and return the Lempel-Ziv
     decomposition of the word in the form of a list iB of index such that the
     blocks of the decomposition are T.word()[iB[k]:iB[k+1]]
+
+    The Lempel-Ziv decomposition is the factorisation u_1...u_k of a word 
+    w=x_1...x_n such that u_i is the longest prefix of u_i...u_k that has an
+    occurence starting before u_i or a letter if the prefix is empty.
     
     EXAMPLE:
 
         sage: w = Word('abababb')
         sage: T = w.suffix_tree()
         sage: T.LZ_decomposition()
-        [0,1,2,6,7]
+        [0, 1, 2, 6, 7]
         sage: w = Word('abaababacabba')
         sage: T = w.suffix_tree()
         sage: T.LZ_decomposition()
-        [0,1,2,3,6,8,9,11,13]
+        [0, 1, 2, 3, 6, 8, 9, 11, 13]
         sage: w = Word([0,0,0,1,1,0,1])
         sage: T = w.suffix_tree()
         sage: T.LZ_decomposition()
-        [0,1,3,4,5,7]
+        [0, 1, 3, 4, 5, 7]
         sage: w=Word('0000100101')
         sage: T=w.suffix_tree()
         sage: T.LZ_decomposition()
-        [0,1,4,5,9,10]
+        [0, 1, 4, 5, 9, 10]
     """
     iB=[0]
     i=0
