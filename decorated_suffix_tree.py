@@ -199,6 +199,8 @@ FiniteWord_class.longest_backward_extension=longest_backward_extension
 class DecoratedSuffixTree(ImplicitSuffixTree):
     
     def __init__(self, w):
+        end_symbol="$"
+        w = Word(str(w)+"$")
         ImplicitSuffixTree.__init__(self, w)
         self.labeling=self._complete_labeling()
         
@@ -397,7 +399,6 @@ def run_test(n,alphabet='01',test_for_double=False):
     """
     for w in tqdm(Words(alphabet,n)):
         S1=naive_square_voc(w)
-        w=Word(w,alphabet+'$')*Word('$')
         T=DecoratedSuffixTree(w)
         L=T.square_vocabulary(output="word")
         S2=set(L)
