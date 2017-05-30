@@ -140,13 +140,24 @@ def count_and_skip(self,node,(i,j)):
     possible from "node"
 
     INPUTS:
+
         node - explicit node of T
         (i,j) - Indices of factor T.word()[i:j]
+
     OUTPUT:
+
         The node obtained by starting at "node" and following the edges
         labeled by the letter of T.word()[i:j]. Returns "("explicit",
-        end_node) if w and at a "end_node", of "("implicit", edge, d)" if
-        we end at d sports along an edge.
+        end_node) if w ends at a "end_node", and "("implicit", edge, d)" if
+        it ends at a spot along an edge.
+
+    EXAMPLES:
+
+        sage:T=Word('00110111011').suffix_tree()
+        sage:T.count_and_skip(5,(2,5))
+        ("implicit", (9, 10), 2)
+        sage:T.count_and_skip(0, (1, 4))
+        ("explicit", 7)
     """
     if i==j: #We're done reading the factor
         return ('explicit',node)
@@ -162,11 +173,26 @@ def count_and_skip(self,node,(i,j)):
 
 def suffix_walk(self,(edge,l)):
     r"""
-    INPUT:
+    Compute the suffix walk from the input state. If the input state is path
+    label "aw" with "a" a letter, the output is the state of "w".
+
+    INPUTS:
+
         edge - the edge containign the state
         l - the string-depth of the state on edge (l>0)
+
     OUTPUT:
-      Dépend de ce que je fait avec count_and_skip  
+
+        Returns "("explicit", end_node) if the state of "w" is an explicit state
+        and "("implicit", edge, d)" if the state of "w" is implicit on "edge".
+
+    EXAMPLES:
+
+        sage:T=Word('00110111011').suffix_tree()
+        sage:T.suffix_walk(((0,5),1))
+        ("explicit", 0)
+        sage:T.suffix_walk(((7,3),1))
+        ("implicit", (9,4), 1)
     """
     #If the state is implicit
     parent=self.suffix_link(edge[0])
