@@ -213,32 +213,61 @@ ImplicitSuffixTree.suffix_walk=suffix_walk
 #===============================================================================
 #        Fonction à ajouter Word
 #===============================================================================
-def longest_forward_extension(w,x,y):
-    r"""Compute the length of le longest factor of w that start at x and that
-    matches a factor that start at y.
+def longest_forward_extension(self,x,y):
+    r"""
+    Compute the length of le longest factor of self that starts at x and that
+    matches a factor that starts at y. Returns 0 if x or y are not valid
+    position in self.
+
     INPUTS:
-        w - a word
-        x,y - position in w
-    OUTPUTS:
-        Length of the longest foward extension"""
+
+        x,y - positions in self
+
+    EXAMPLES:
+
+        sage:w=Word('0011001')
+        sage:w.longest_forward_extension(0,5)
+        3
+        sage:w.longest_forward_extension(0,2)
+        0
+        sage:w.longest_forward_extension(-3,2)
+        0
+    """
+    length=self.length()
+    if not (0<=x and 0<=y):
+        return 0
     l=0
-    while x<len(w) and y<len(w) and w[x]==w[y]:
+    while x<length and y<length and self[x]==self[y]:
         l+=1
         x+=1
         y+=1
     return l
 
 
-def longest_backward_extension(w,x,y):
-    r"""Compute the length of le longest factor of w that ends at x and that
-    matches a factor that ends at y.
+def longest_backward_extension(self,x,y):
+    r"""
+    Compute the length of le longest factor of w that ends at x and that
+    matches a factor that ends at y. Returns 0 if x or y are note valid position
+    in self.
+
     INPUTS:
-        w - a word
-        x,y - position in w
-    OUTPUTS:
-        Length of the longest backward extension"""
+
+        x,y - position in self
+
+    EXAMPLES:
+        
+        sage:w=Word('0011001')
+        sage:w.longest_backward_extension(7,2)
+        3
+        sage:w.longest_backward_extension(1,5)
+        1
+        sage:w.longest_forward_extension(4,23)
+    """
+    length=self.length()
+    if not (x<length and y<length):
+        return 0
     l=0
-    while x>=0 and y>=0 and w[x]==w[y]:
+    while x>=0 and y>=0 and self[x]==self[y]:
         l+=1
         x-=1
         y-=1
