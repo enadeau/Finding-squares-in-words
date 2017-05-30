@@ -4,11 +4,11 @@ from tqdm import tqdm
 #===============================================================================
 #        Fonction à ajouter à Implicit Suffix Tree
 #===============================================================================
-def LZ_decomposition(T):
+def LZ_decomposition(self):
     r"""
-    Take the implicit suffix tree of a word and return the Lempel-Ziv
-    decomposition of the word in the form of a list iB of index such that the
-    blocks of the decomposition are T.word()[iB[k]:iB[k+1]]
+    Return the Lempel-Ziv decomposition of the self.word() in the form of a list
+    iB of index such that the blocks of the decomposition are 
+    self.word()[iB[k]:iB[k+1]]
 
     The Lempel-Ziv decomposition is the factorisation u_1...u_k of a word 
     w=x_1...x_n such that u_i is the longest prefix of u_i...u_k that has an
@@ -35,10 +35,10 @@ def LZ_decomposition(T):
     """
     iB=[0]
     i=0
-    w=T.word()
+    w=self.word()
     while i<len(w):
         l=0
-        ((x,y),successor)=T._find_transition(0, w[i])
+        ((x,y),successor)=self._find_transition(0, w[i])
         x=x-1
         while x<i+l:
             if y==None:
@@ -48,19 +48,19 @@ def LZ_decomposition(T):
             if i+l>=len(w):
                 l=len(w)-i
                 break
-            ((x,y),successor)=T._find_transition(successor,w[i+l])
+            ((x,y),successor)=self._find_transition(successor,w[i+l])
             x=x-1
         i+=max(1,l)
         iB.append(i)
     return iB
 
-def leftmost_covering_set(T):
+def leftmost_covering_set(self):
     r"""
-    Compute the leftmost covering set of squares pair in T.word(). Return square
-    as pair (i,l) specifying T.word()[i:i+l]
+    Compute the leftmost covering set of squares pair in self.word(). Return 
+    square as pair (i,l) specifying self.word()[i:i+l]
 
     A leftmost covering set is a set such that the leftmost occurence (j,l) of a
-    type of square in T.word() is covered by a pair (i,l) in the set for all
+    type of square in self.word() is covered by a pair (i,l) in the set for all
     types of squares. We say that (j,l) is covered by (i,l) if (i,l), (i+1,l),
     ..., (j,l) are all squares.
 
@@ -81,7 +81,7 @@ def leftmost_covering_set(T):
 
     REFERENCE:
 
-    - [1] Gusfield, D., & Stoye, J. (2004). Linear time algorithms for finding
+    * [1] Gusfield, D., & Stoye, J. (2004). Linear time algorithms for finding
       and representing all the tandem repeats in a string. Journal of Computer
       and System Sciences, 69(4), 525-546.
     """
@@ -122,8 +122,8 @@ def leftmost_covering_set(T):
                 #print start<B[i]
                 yield (start,2*k)
 
-    w=T.word()
-    B=T.LZ_decomposition()
+    w=self.word()
+    B=self.LZ_decomposition()
     P=[[] for _ in w]
     for i in range(len(B)-1):
         squares=list(condition2_square_pairs(i))+list(condition1_square_pairs(i))
@@ -252,7 +252,7 @@ def longest_backward_extension(self,x,y):
 
     INPUTS:
 
-        x,y - position in self
+        x,y - positions in self
 
     EXAMPLES:
         
