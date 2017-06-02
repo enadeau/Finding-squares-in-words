@@ -284,13 +284,58 @@ FiniteWord_class.longest_backward_extension=longest_backward_extension
 class DecoratedSuffixTree(ImplicitSuffixTree):
     
     def __init__(self, w):
+        r"""
+        Construct the decorated suffix tree of a word
+
+        A decorated suffix tree of w is the suffix tree of w  marked with the
+        end point of all squares in the w.
+
+        The symbol "$" is append to w to ensure de that each final state is a
+        leaf of the suffix tree.
+
+        When using pair as output, all the algorithm are linear in the length of
+        the word w
+
+        INPUT:
+
+            w - word
+
+        EXAMPLES:
+
+            sage: w=Word('0011001')
+            sage: DecoratedSuffixTree(w)
+            Decorated suffix tree of : 0011001$
+
+        REFERENCE:
+        
+          * [1] Gusfield, D., & Stoye, J. (2004). Linear time algorithms for 
+          finding and representing all the tandem repeats in a string. Journal 
+          of Computer and System Sciences, 69(4), 525-546.
+        """
+        if not isinstance(w, FiniteWord_class):
+            raise ValueError("w must be a member of FiniteWord_class")
+        if "$" in w:
+            raise ValueError("The symbol '$' is reserved for this class ")
         end_symbol="$"
         w = Word(str(w)+"$")
         ImplicitSuffixTree.__init__(self, w)
         self.labeling=self._complete_labeling()
-        
+
+    def __repr__(self):
+        return "Decorated suffix tree of : %s" %self.word()
 
     def _partial_labeling(self):
+        r"""
+        Make a depth first search in the suffix tree and mark some squares of a
+        leftmost covering set of the tree. Used by _complete_labeling.
+
+        EXAMPLES:
+
+            sage:w=Word('abaababbabba')
+            sage:T=DecoratedSuffixTree(w)
+            sage:T._partial_labeling()
+            {(3, 4): [1], (5, 1): [3], (5, 6): [1], (11, 17): [1], (13, 8): [1], (15, 10): [2]}
+        """
         def node_processing(node,parent,(i,pos)):
             r"""
             Mark point along the edge (parent,node) if the string depht of parent is
@@ -315,18 +360,21 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
 
         def treat_node(current_node,parent):
             r"""
-            Proceed to a depth first search in T, couting the string_depth of each
-            node a processing each node for marking
+            Proceed to a depth first search in T, couting the string_depth of
+            each node a processing each node for marking
 
             To initiate de depth first search call treat_node(0,None)
 
             INPUTS:
+
                 current_node - A node
                 parent - Parent of current_node in T
+
             OUTPUT:
-                The resultint list P(current_node) avec current_node have been
-                process by node_processing. The ouput is a pair (i,pos) such that
-                P[i][pos:] is the list of current_node
+
+                The resulting list P(current_node) avec current_node have been
+                process by node_processing. The ouput is a pair (i,pos) such
+                that P[i][pos:] is the list of current_node.
             """
             #Call recursively on children of current_node
             if D.has_key(current_node):
@@ -354,17 +402,26 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
 
     def _complete_labeling(self):
         r"""
-        Returns a dictionnary of edges of T, whit markpoint for the end of each
-        square types of T.word()
+        Returns a dictionnary of edges of self, with markpoint for the end of
+        each square types of T.word()
+
         INPUT:
-            T - Suffix tree
+
+            self - Suffix tree
+
+        EXAMPLES:
+            sage:w=Word('aabbaaba')
+            sage:DecoratedSuffixTree(w)._complete_labeling()
+            {(2, 7): [1], (5,4): [1]}
         """
 
         def walk_chain(u,v,l,start):
             r"""
-            Execute a chain of suffix walk until a walk is unsuccesful or it got to
-            a point already register in QP. Register all visited point in Q
+            Execute a chain of suffix walk until a walk is unsuccesful or it got
+            to a point already register in QP. Register all visited point in Q.
+
             INPUTS:
+
                 (u,v) - edge on wich the point is registered
                 l - depth of the registered point on (u,v)
                 start - start of the squares registered by the label (u,v),l
@@ -402,10 +459,12 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
 
         def treat_node(current_node,(i,j)):
             r"""
-            Execute a depht first search on T and start a suffix walk for labeled
-            points on each edges of T. The fonction is reccursive, call
-            treat_node(0,(0,0)) to start the search
-            INPUTS
+            Execute a depht first search on self and start a suffix walk for
+            labeled points on each edges of T. The fonction is reccursive, call
+            treat_node(0,(0,0)) to initiate the search
+
+            INPUTS:
+
                 current_node - The node that is to treat
                 (i,j) - Pair of index such that the path from 0 to current_node
                 reads T.word()[i:j]
@@ -431,8 +490,19 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
         Return the list of squares in the squares vocabulary of self.word.
         Return a list of pair in output="pair" and the explicit word if
         output="word"
+
         INPUTS:
+
             output - "pair" or "word"
+
+        EXAMPLES:
+
+            sage: w=Word('aabb')
+            sage: DecoratedSuffixTree(w).square_vocabulary()
+            [(0, 0), (0, 2), (2, 2)]
+            sage: w=Word('00110011010')
+            sage: DecoratedSuffixTree(w).square_vocabulary(output="word")
+            [word: , word: 01100110, word: 00110011, word: 00, word: 11, word: 1010]
         """
         def treat_node(current_node,(i,j)):
             if D.has_key(current_node):
