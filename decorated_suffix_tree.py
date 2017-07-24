@@ -322,7 +322,10 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
         self.labeling=self._complete_labeling()
 
     def __repr__(self):
-        return "Decorated suffix tree of : %s" %self.word()
+        w=self.word()
+        if len(w)>40:
+            w=str(w[:40])+'...'
+        return "Decorated suffix tree of : %s" %w
 
     def _partial_labeling(self):
         r"""
