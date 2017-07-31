@@ -135,7 +135,7 @@ def leftmost_covering_set(self):
     
 def count_and_skip(self,node,(i,j)):
     r"""
-    Use count and skip trick to follow the path starting and "node" and
+    Use count and skip trick to follow the path starting at "node" and
     reading self.word()[i:j]. We assume that reading self.word()[i:j] is 
     possible from "node"
 
