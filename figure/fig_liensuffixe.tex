@@ -1,0 +1,27 @@
+\begin{tikzpicture}
+    \node[draw, shape=circle] (u) at (0,0) {\scriptsize $u$};
+    \node (e1) at (0,-1) {\scriptsize $\cdots$};
+    \node (e2) at (0,-2){$\cdots$};
+    \node[draw, shape=circle] (v1) at (-1,-3){\scriptsize $v_1$};
+    \node[draw, shape=circle] (v2) at (1,-3){\scriptsize $v_2$};
+    \draw (u)--(e1);
+    \draw (e1)--node[right] {$e$}++(e2);
+    \draw (v2)--(e2);
+    \draw (v1)--(e2);
+    
+    \node[draw, shape=circle] (up) at (5,0) {\scriptsize $u'$};
+    \node (e1p) at (5,-1) {\scriptsize $\cdots$};
+    \node[draw, shape=circle] (e2p) at (5,-2){\scriptsize $v$};
+    \node[draw, shape=circle] (v1p) at (4,-3){\scriptsize $v_1'$};
+    \node[draw, shape=circle] (v2p) at (6,-3){\scriptsize $v_2'$};
+    \draw (up)--(e1p);
+    \draw (e1p)--(e2p);
+    \draw (v2p)--(e2p);
+    \draw (v1p)--(e2p);
+    
+    \draw [->,dashed] (v1p) ..controls (3,-5) ..(v1);
+    \draw [->,dashed] (v2p) ..controls (5,-5) ..(v2);
+    \draw [->,dashed] (up) ..controls (2,1) ..(u);
+    \draw [->,dashed] (e2p)--(3,-2);
+    \node[left] at (3,-2) {\scriptsize ?};
+\end{tikzpicture}

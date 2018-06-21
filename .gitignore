@@ -1,11 +1,10 @@
 *.pdf
+!rapport.pdf
 *.aux
 *.bbl
-*.tex
 *.gz
 *.tiff
 *.log
-figure
 *.swp
 *.bib
 *.blg
