@@ -1,19 +1,16 @@
-#To install tqdm run sage -pip install tqdm in a terminal
-from tqdm import tqdm
-
 #===============================================================================
 #        Fonction à ajouter à Implicit Suffix Tree
 #===============================================================================
 def LZ_decomposition(self):
     r"""
     Return the Lempel-Ziv decomposition of the self.word() in the form of a list
-    iB of index such that the blocks of the decomposition are 
+    iB of index such that the blocks of the decomposition are
     self.word()[iB[k]:iB[k+1]]
 
-    The Lempel-Ziv decomposition is the factorisation u_1...u_k of a word 
+    The Lempel-Ziv decomposition is the factorisation u_1...u_k of a word
     w=x_1...x_n such that u_i is the longest prefix of u_i...u_k that has an
     occurence starting before u_i or a letter if the prefix is empty.
-    
+
     EXAMPLE:
 
         sage: w = Word('abababb')
@@ -56,7 +53,7 @@ def LZ_decomposition(self):
 
 def leftmost_covering_set(self):
     r"""
-    Compute the leftmost covering set of squares pair in self.word(). Return 
+    Compute the leftmost covering set of squares pair in self.word(). Return
     square as pair (i,l) specifying self.word()[i:i+l]
 
     A leftmost covering set is a set such that the leftmost occurence (j,l) of a
@@ -67,7 +64,7 @@ def leftmost_covering_set(self):
     The set is return in the form of a list P such that P[i] contains all the
     the length of square starting at i in the set. The list P[i] are sort in
     decreasing order.
-    
+
     EXAMPLES:
 
         sage: w=Word('abaabaabbaaabaaba')
@@ -87,7 +84,7 @@ def leftmost_covering_set(self):
     """
     def condition1_square_pairs(i):
         r"""
-        Compute the square that has their center in the i-th block of 
+        Compute the square that has their center in the i-th block of
         LZ-decomposition and that start in the i-th block and end in the
         (i+1)-th
         """
@@ -100,7 +97,7 @@ def leftmost_covering_set(self):
                 #print "Condition 1 yield (%s,%s) for block %s" %(start,2*k,i)
                 #print start>=B[i]
                 yield (start,2*k)
-    
+
     def condition2_square_pairs(i):
         r"""
         Compute the squares that has their center in the i-th block of the
@@ -132,11 +129,11 @@ def leftmost_covering_set(self):
     for l in P:
         l.reverse()
     return P
-    
+
 def count_and_skip(self,node,(i,j)):
     r"""
     Use count and skip trick to follow the path starting at "node" and
-    reading self.word()[i:j]. We assume that reading self.word()[i:j] is 
+    reading self.word()[i:j]. We assume that reading self.word()[i:j] is
     possible from "node"
 
     INPUTS:
@@ -202,7 +199,7 @@ def suffix_walk(self,(edge,l)):
     #(i-1,j) is the label of edge
     i-=1
     return self.count_and_skip(parent,(i,i+l))
-    
+
 
 from sage.combinat.words.suffix_trees import ImplicitSuffixTree
 ImplicitSuffixTree.LZ_decomposition = LZ_decomposition
@@ -255,7 +252,7 @@ def longest_backward_extension(self,x,y):
         x,y - positions in self
 
     EXAMPLES:
-        
+
         sage:w=Word('0011001')
         sage:w.longest_backward_extension(7,2)
         3
@@ -273,7 +270,7 @@ def longest_backward_extension(self,x,y):
         y-=1
     return l
 
-from sage.combinat.words.finite_word import FiniteWord_class  
+from sage.combinat.words.finite_word import FiniteWord_class
 FiniteWord_class.longest_forward_extension=longest_forward_extension
 FiniteWord_class.longest_backward_extension=longest_backward_extension
 
@@ -282,7 +279,7 @@ FiniteWord_class.longest_backward_extension=longest_backward_extension
 #===============================================================================
 
 class DecoratedSuffixTree(ImplicitSuffixTree):
-    
+
     def __init__(self, w):
         r"""
         Construct the decorated suffix tree of a word
@@ -307,9 +304,9 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
             Decorated suffix tree of : 0011001$
 
         REFERENCE:
-        
-          * [1] Gusfield, D., & Stoye, J. (2004). Linear time algorithms for 
-          finding and representing all the tandem repeats in a string. Journal 
+
+          * [1] Gusfield, D., & Stoye, J. (2004). Linear time algorithms for
+          finding and representing all the tandem repeats in a string. Journal
           of Computer and System Sciences, 69(4), 525-546.
         """
         if not isinstance(w, FiniteWord_class):
@@ -394,7 +391,7 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
                 node_list=(n-string_depth[current_node],0)
             #Make teatement on current node hear
             return node_processing(current_node,parent,node_list)
-        
+
         P=leftmost_covering_set(self)
         D=self.transition_function_dictionary()
         string_depth=dict([(0,0)])
@@ -487,7 +484,7 @@ class DecoratedSuffixTree(ImplicitSuffixTree):
         D=self.transition_function_dictionary()
         treat_node(0,(0,0))
         return labeling
-        
+
     def square_vocabulary(self,output="pair"):
         r"""
         Return the list of squares in the squares vocabulary of self.word.
@@ -555,7 +552,7 @@ def run_test(n,alphabet='01',test_for_double=False):
     OUTPUT:
         True if works for all words, False if it bugs for a word
     """
-    for w in tqdm(Words(alphabet,n)):
+    for w in Words(alphabet,n):
         S1=naive_square_voc(w)
         T=DecoratedSuffixTree(w)
         L=T.square_vocabulary(output="word")
