@@ -7,6 +7,8 @@ article *Linear time algorithms for finding and representing all the tandem
 repeats in a string* by Dan Gusfield and Jens Stoye
 (https://doi.org/10.1016/j.jcss.2004.03.004)
 
+A detailed report (in french) is available in the repo.
+
 Background
 ==========
 
